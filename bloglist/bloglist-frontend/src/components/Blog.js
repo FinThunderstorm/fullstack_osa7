@@ -1,26 +1,17 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { likeBlog, removeBlog } from '../reducers/blogReducer'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
+import { useParams } from 'react-router-dom'
 
 
 
-const Blog = (props) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'dotted',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-
+const Blog = () => {
   const dispatch = useDispatch()
 
-  const [visible, setVisible] = useState(false)
-
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
+  const id = useParams().id
+  const blog = useSelector(state => state.blogs.find(b => b.id === id))
+  const user = useSelector(state => state.user)
 
   const handleLike = (blog) => (event) => {
     event.preventDefault()
@@ -35,37 +26,22 @@ const Blog = (props) => {
     }
     
   }
-
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
-  if(props.blog.user.id === JSON.parse(window.localStorage.getItem('loggedBlogAppUser')).id){
-    return (
-      <div style={blogStyle}>
-        <div className='blog' onClick={() => toggleVisibility()}>
-          {props.blog.title} {props.blog.author}
-          <div className='info' style={showWhenVisible}>
-            <div>{props.blog.url}</div>
-            <div>{props.blog.likes} likes <button onClick={handleLike(props.blog)}>like</button></div>
-            <div>added by {props.blog.user.name}</div>
-            <div><button onClick={handleDeleteBlog(props.blog)}>remove</button></div>
-          </div>
-        </div>
-      </div>
-    )
-  } else{
-    return (
-      <div style={blogStyle}>
-        <div className='blog' onClick={() => toggleVisibility()}>
-          {props.blog.title} {props.blog.author}
-          <div className='info' style={showWhenVisible}>
-            <div>{props.blog.url}</div>
-            <div>{props.blog.likes} likes <button onClick={handleLike(props.blog)}>like</button></div>
-            <div>added by {props.blog.user.name}</div>
-          </div>
-        </div>
-      </div>
-    )
+  if(!blog || !user){
+    return null
   }
+
+  return (
+    <div>
+      <div>
+        {blog.title} {blog.author}
+        <div>{blog.url}</div>
+        <div>{blog.likes} likes <button onClick={handleLike(blog)}>like</button></div>
+        <div>added by {blog.user.name}</div>
+        {user.id === blog.user.id ? <div><button onClick={handleDeleteBlog(blog)}>remove</button></div> : null}
+      </div>
+    </div>
+  )
+  
 }
 
 export default Blog

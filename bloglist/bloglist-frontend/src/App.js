@@ -1,28 +1,26 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  BrowserRouter as Router,
+  Switch, Route
+} from "react-router-dom"
 
 import './App.css'
 
 import blogsService from './services/blogs'
 
+import NavBar from './components/NavBar'
 import Blog from './components/Blog'
-import BlogForm from './components/BlogForm'
-import Notification from './components/Notification'
-
-import { useField } from './hooks'
-import { removeReset } from './utils'
+import Blogs from './components/Blogs'
 
 import { initializeBlogs } from './reducers/blogReducer'
-import { login, logout, setUser } from './reducers/userReducer'
+import {  setUser } from './reducers/userReducer'
+import LoginForm from './components/LoginForm'
 
 
 const App = () => {
   const dispatch = useDispatch()
 
-  const username = useField('text')
-  const password = useField('password')
-
-  const blogs = useSelector(state => state.blogs.sort((a,b) => b.likes-a.likes))
   const user = useSelector(state => state.user)
 
   useEffect(() => {
@@ -41,38 +39,13 @@ const App = () => {
     }
   },[user, dispatch])
 
-  const handleLogin = (event) => {
-    event.preventDefault()
-    dispatch(login({username, password}))
-    username.reset()
-    password.reset()
-  }
 
-  const handleLogout = (event) => {
-    event.preventDefault()
-    dispatch(logout())
-    window.localStorage.removeItem('loggedBlogAppUser')
-  }
 
   
 
-  if (user === null) {
+  /*if (user === null) {
     return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification />
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input { ...removeReset(username) }/>
-          </div>
-          <div>
-            password
-            <input { ...removeReset(password) }/>
-          </div>
-          <div><button>login</button></div>
-        </form>
-      </div>
+      <LoginForm />
     )
   }
 
@@ -87,6 +60,44 @@ const App = () => {
         <Blog key={blog.id} blog={blog}/>
       )}
     </div>
+  )*/
+
+  /*
+        
+
+          <Route path='/users/:id'>
+            <User />
+          </Route>
+
+          <Route path='/users'>
+            <Users />
+          </Route>
+
+  */
+
+  return (
+    <div>
+      
+      <Router>
+        <NavBar />
+        <Switch>
+
+          <Route path='/login'>
+            <LoginForm />
+          </Route>
+
+          <Route path='/blogs/:id'>
+            <Blog />
+          </Route>
+
+          <Route path='/'>
+            <Blogs />
+          </Route>
+
+        </Switch>
+      </Router>
+    </div>
+    
   )
 }
 
