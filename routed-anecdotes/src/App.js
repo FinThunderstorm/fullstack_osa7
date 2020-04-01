@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import {
-  BrowserRouter as Router,
-  Route, Link, Redirect, withRouter
+  Route, Link, withRouter, Switch, useRouteMatch
 } from 'react-router-dom'
 import { useField } from './hooks'
 
@@ -32,7 +31,7 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id} ><Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link></li>)}
     </ul>
   </div>
 )
@@ -80,23 +79,41 @@ const CreateNewNoHistory = (props) => {
     props.history.push('/')
   }
 
+  const handleReset = (e) => {
+    e.preventDefault()
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
+  const returnWithoutReset = (withReset) => {
+    console.log(withReset)
+    const withoutReset = {
+      'name': withReset.name,
+      'value': withReset.value,
+      'onChange': withReset.onChange,
+    }
+    console.log(withoutReset)
+    return withoutReset
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content}/>
+          <input {...returnWithoutReset(content)}/>
         </div>
         <div>
           author
-          <input {...author}/>
+          <input {...returnWithoutReset(author)}/>
         </div>
         <div>
           url for more info
-          <input {...info}/>
+          <input {...returnWithoutReset(info)}/>
         </div>
-        <button>create</button>
+        <button>create</button><button onClick={handleReset}>reset</button>
       </form>
     </div>
   )
@@ -106,6 +123,8 @@ const CreateNewNoHistory = (props) => {
 const CreateNew = withRouter(CreateNewNoHistory)
 
 const App = () => {
+  
+
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -123,6 +142,11 @@ const App = () => {
     }
   ])
 
+  const match = useRouteMatch('/anecdotes/:id')
+  const anecdote = match
+    ? anecdotes.find(a => a.id === match.params.id)
+    : null
+
   const [notification, setNotification] = useState('')
 
   const Notification = ({ message }) => {
@@ -139,11 +163,9 @@ const App = () => {
     setTimeout(() => {setNotification('')}, 10*1000)
   }
 
-  const anecdoteById = (id) =>
-    anecdotes.find(a => a.id === id)
+  
 
   const vote = (id) => {
-    const anecdote = anecdoteById(id)
 
     const voted = {
       ...anecdote,
@@ -156,17 +178,27 @@ const App = () => {
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Router>
         <div>
           <Menu />
           <Notification message={notification} />
-          <Route exact path="/" render={() => <AnecdoteList anecdotes={anecdotes} />} />
-          <Route exact path="/anecdotes" render={() => <AnecdoteList anecdotes={anecdotes} />} />
-          <Route exact path="/anecdotes/:id" render={({ match }) => <Anecdote anecdote={anecdoteById(match.params.id)} />} />
-          <Route path="/create" render={() => <CreateNew addNew={addNew}/>} />
-          <Route path="/about" render={() => <About />} />
+          <Switch>
+            <Route path='/anecdotes/:id'>
+              <Anecdote anecdote={anecdote} />
+            </Route>
+            <Route path='/anecdotes'>
+              <AnecdoteList anecdotes={anecdotes} />
+            </Route>
+            <Route path='/create'>
+              <CreateNew addNew={addNew} />
+            </Route>
+            <Route path='/about'>
+              <About />
+            </Route>
+            <Route path='/'>
+              <AnecdoteList anecdotes={anecdotes} />
+            </Route>
+          </Switch>
         </div>
-      </Router>
       <Footer />
     </div>
   )
