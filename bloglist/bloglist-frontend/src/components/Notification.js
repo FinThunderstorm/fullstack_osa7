@@ -1,4 +1,6 @@
 import React from 'react'
+import { Alert } from '@material-ui/lab'
+import { Paper } from '@material-ui/core'
 import { useSelector } from 'react-redux'
 
 const Notification = (props) => {
@@ -11,9 +13,9 @@ const Notification = (props) => {
     return null
   }
   return (
-    <div className={errorType}>
+    <Alert component={Paper} variant='filled' severity={errorType}>
       {message}
-    </div>
+    </Alert>
   )
 }
 

@@ -1,14 +1,14 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 
-import Notification from './Notification'
+import { TextField, Button, Grid, Typography } from '@material-ui/core'
 
 import { useDispatch } from 'react-redux'
 
 import { useField } from '../hooks'
 import { removeReset } from '../utils'
 
-import { login } from '../reducers/userReducer'
+import { login } from '../reducers/loginReducer'
 
 const LoginForm = () => {
   const dispatch = useDispatch()
@@ -26,21 +26,14 @@ const LoginForm = () => {
   }
 
   return (
-    <div>
-      <h2>Log in to application</h2>
-      <Notification />
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input { ...removeReset(username) }/>
-        </div>
-        <div>
-          password
-          <input { ...removeReset(password) }/>
-        </div>
-        <div><button>login</button></div>
-      </form>
-    </div>
+    <form onSubmit={handleLogin}>
+      <Grid container spacing={1} direction='column' justify='space-around' alignItems='center'>
+        <Grid item><Typography component='h1' variant='h5'>Log in to application</Typography></Grid>
+        <Grid item><TextField label='Username' variant='outlined' { ...removeReset(username) }/></Grid>
+        <Grid item><TextField label='Password' variant='outlined' { ...removeReset(password) }/></Grid>
+        <Grid item><Button variant='contained' color='primary' type='submit'>login</Button></Grid>
+      </Grid>
+    </form>
   )
 } 
 
